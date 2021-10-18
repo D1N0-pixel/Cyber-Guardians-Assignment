@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 int (*builtin_func[]) (int, char **) = {
     &tinysh_cd,
