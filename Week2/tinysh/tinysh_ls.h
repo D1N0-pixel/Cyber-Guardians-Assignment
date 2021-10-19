@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int tinysh_ls(int argc, char **args);
+int tinysh_ls(int argc, char **argv);
 int listfile(char *path, char L, char A);
 int ls_help();
 int get_digit(int num);

@@ -1,10 +1,10 @@
 #include "tinysh_cd.h"
 
-int tinysh_cd(int argc, char **args) {
-    if (args[1] == NULL) {
+int tinysh_cd(int argc, char **argv) {
+    if (argv[1] == NULL) {
         fprintf(stderr, "tinysh: expected argument to \"cd\"\n");
     } else {
-        if (chdir(args[1]) != 0) {
+        if (chdir(argv[1]) != 0) {
             perror("tinysh");
         }
     }

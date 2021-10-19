@@ -1,6 +1,6 @@
 #include "tinysh_help.h"
 
-int tinysh_help(int argc, char **args) {
+int tinysh_help(int argc, char **argv) {
     int i;
     printf("D1N0's tiny shell\n");
     printf("Type program names and arguments, and hit enter.\n");

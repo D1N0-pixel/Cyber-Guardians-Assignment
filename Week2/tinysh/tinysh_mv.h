@@ -5,5 +5,5 @@
 #include <stdlib.h>
 #include <string.h>
 
-int tinysh_mv(int argc, char **args);
+int tinysh_mv(int argc, char **argv);
 int move_to_dir(char *file, char *path);

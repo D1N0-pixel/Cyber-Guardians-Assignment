@@ -1,24 +1,26 @@
 #include "tinysh_ls.h"
 
-int tinysh_ls(int argc, char **args) {
+int tinysh_ls(int argc, char **argv) {
     char L = 0;
     char A = 0;
     char HELP = 0;
-    char DR = 1;
+    char DR = 0;
     for (int i = 1; i < argc; ++i) {
-        if (strcmp(args[i], "--help") == 0) {
+        if (strcmp(argv[i], "--help") == 0) {
             HELP = 1;
             break;
         }
-        if (args[i][0] == '-') {
-            for (int j = 1; j < strlen(args[i]); ++j) {
-                if (args[i][j] == 'l') {
+        if (argv[i][0] == '-') {
+            for (int j = 1; j < strlen(argv[i]); ++j) {
+                if (argv[i][j] == 'l') {
                     L = 1;
                 }
-                if (args[i][j] == 'a') {
+                if (argv[i][j] == 'a') {
                     A = 1;
                 }
             }
+        } else {
+            DR = DR <= 1 ? DR + 1 : 2;
         }
     }
     if (HELP) {
@@ -26,12 +28,24 @@ int tinysh_ls(int argc, char **args) {
         return 1;
     } 
     for (int i = 1; i < argc; ++i) {
-        if (args[i][0] != '-') {
-            DR = 0;
-            listfile(args[i], L, A);
+        if (argv[i][0] != '-') {
+            struct stat sb;
+            stat(argv[i], &sb);
+            if ((sb.st_mode & S_IFMT) == S_IFDIR) {
+                if (DR >= 2) {   
+                    printf("%s:\n", argv[i]);
+                }
+                listfile(argv[i], L, A);
+            } else {
+                if (L) {
+                    ls_l(argv[i]);
+                } else {
+                    printf("%s\n", argv[i]);
+                }
+            }
         }
     }
-    if (DR) {
+    if (!DR) {
         listfile(".\0", L, A);
     }
     return 1;
@@ -51,7 +65,7 @@ int listfile(char *path, char L, char A) {
     DIR * d = opendir(path);
     if (d == NULL)
         return -1;
-    
+
     struct dirent * dir;
     while ((dir = readdir(d)) != NULL) {
         if (!A && dir->d_name[0] == '.') {
