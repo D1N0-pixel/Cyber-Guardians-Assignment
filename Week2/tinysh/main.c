@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <readline/readline.h>
 
 int (*builtin_func[]) (int, char **) = {
     &tinysh_cd,
@@ -18,10 +19,7 @@ int (*builtin_func[]) (int, char **) = {
     &tinysh_ls
 };
 
-void sig_handler(int signum) {
-    printf("\n> ");
-    fflush(stdout);
-}
+void sig_handler(int signum) { }
 
 int tinysh_launch(char **args) {
     pid_t pid;
@@ -65,55 +63,62 @@ int tinysh_execute(int argc, char **args) {
 }
 
 char *tinysh_read_line(void) {
-#ifdef TINYSH_USE_STD_GETLINE
-    char *line = NULL;
-    ssize_t bufsize = 0; // have getline allocate a buffer for us
-    if (getline(&line, &bufsize, stdin) == -1) {
-        if (feof(stdin)) {
-            exit(EXIT_SUCCESS);  // We received an EOF
-        } else  {
-            perror("tinysh: getline\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-    return line;
-#else
-#define TINYSH_RL_BUFSIZE 1024
-    int bufsize = TINYSH_RL_BUFSIZE;
-    int position = 0;
-    char *buffer = malloc(sizeof(char) * bufsize);
-    int c;
-
-    if (!buffer) {
-        fprintf(stderr, "tinysh: allocation error\n");
-        exit(EXIT_FAILURE);
-    }
-
-    while (1) {
-        // Read a character
-        c = getchar();
-
-        if (c == EOF) {
-            exit(EXIT_SUCCESS);
-        } else if (c == '\n') {
-            buffer[position] = '\0';
-            return buffer;
-        } else {
-            buffer[position] = c;
-        }
-        position++;
-
-        // If we have exceeded the buffer, reallocate.
-        if (position >= bufsize) {
-            bufsize += TINYSH_RL_BUFSIZE;
-            buffer = realloc(buffer, bufsize);
-            if (!buffer) {
-                fprintf(stderr, "tinysh: allocation error\n");
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
-#endif
+//#ifdef TINYSH_USE_STD_GETLINE
+//    char *line = NULL;
+//    ssize_t bufsize = 0; // have getline allocate a buffer for us
+//    if (getline(&line, &bufsize, stdin) == -1) {
+//        if (feof(stdin)) {
+//            exit(EXIT_SUCCESS);  // We received an EOF
+//        } else  {
+//            perror("tinysh: getline\n");
+//            exit(EXIT_FAILURE);
+//        }
+//    }
+//    return line;
+//#else
+//#define TINYSH_RL_BUFSIZE 1024
+//    int bufsize = TINYSH_RL_BUFSIZE;
+//    int position = 0;
+//    char *buffer = malloc(sizeof(char) * bufsize);
+//    int c;
+//
+//    if (!buffer) {
+//        fprintf(stderr, "tinysh: allocation error\n");
+//        exit(EXIT_FAILURE);
+//    }
+//
+//    while (1) {
+//        // Read a character
+//        c = getchar();
+//
+//        if (c == EOF) {
+//            exit(EXIT_SUCCESS);
+//        } else if (c == '\n') {
+//            buffer[position] = '\0';
+//            return buffer;
+//		} else if (c == '\3') {
+//			printf("\n> ");
+//			position = -1;
+//			buffer = malloc(sizeof(char) * bufsize);
+//		} else {
+//            buffer[position] = c;
+//        }
+//        position++;
+//
+//        // If we have exceeded the buffer, reallocate.
+//        if (position >= bufsize) {
+//            bufsize += TINYSH_RL_BUFSIZE;
+//            buffer = realloc(buffer, bufsize);
+//            if (!buffer) {
+//                fprintf(stderr, "tinysh: allocation error\n");
+//                exit(EXIT_FAILURE);
+//            }
+//        }
+//    }
+//#endif
+	char *line;
+	line = readline("> ");
+	return line;
 }
 
 #define TINYSH_TOK_BUFSIZE 64
@@ -166,7 +171,6 @@ void tinysh_loop(void)
     int status;
 
     do {
-        printf("> ");
         line = tinysh_read_line();
         args = tinysh_split_line(line);
         argc = tinysh_args_len(args);
@@ -179,7 +183,7 @@ void tinysh_loop(void)
 
 int main(int argc, char **argv)
 {
-    signal(SIGINT,sig_handler);
+    signal(SIGINT, sig_handler);
     tinysh_loop();
 
     return EXIT_SUCCESS;

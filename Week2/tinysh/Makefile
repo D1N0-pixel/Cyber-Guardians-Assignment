@@ -1,7 +1,7 @@
 all: tinysh
 
 tinysh: main.o tinysh_cd.o tinysh_exit.o tinysh_help.o tinysh_ls.o tinysh_mv.o builtin.o
-		gcc -o tinysh main.o tinysh_cd.o tinysh_exit.o tinysh_help.o tinysh_ls.o tinysh_mv.o builtin.o
+		gcc -o tinysh main.o tinysh_cd.o tinysh_exit.o tinysh_help.o tinysh_ls.o tinysh_mv.o builtin.o -lreadline
 
 tinysh_cd.o: tinysh_cd.c tinysh_cd.h
 
