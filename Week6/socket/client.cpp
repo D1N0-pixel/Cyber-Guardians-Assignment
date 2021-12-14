@@ -14,8 +14,8 @@
 #define BUF_SIZE 1024
 
 bool checkAddrFormat(const char *addr) {
-	std::regex re("^([0-9]{1,3}\\.){3}[0-9]{1,3}$");
-	return std::regex_match(std::string(addr), re);
+    std::regex re("^([0-9]{1,3}\\.){3}[0-9]{1,3}$");
+    return std::regex_match(std::string(addr), re);
 }
 
 void receiverThread(int server_fd){
@@ -45,22 +45,22 @@ int main(int argc, char **argv)
     const char* server_ip = argv[1];
     int server_port;
 
-	try {
+    try {
         server_port = stoi(std::string(argv[2]));
     } catch (...) {
         std::cout << "Port must be a number" << std::endl;
         return 0;
     }
 
-	if (!checkAddrFormat(server_ip)) {
-		std::cout << "wrong IP address format" << std::endl;
-		return 0;
-	}
+    if (!checkAddrFormat(server_ip)) {
+        std::cout << "wrong IP address format" << std::endl;
+        return 0;
+    }
 
 
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == -1) {
-		std::cerr << "socket creation error" << std::endl;
+        std::cerr << "socket creation error" << std::endl;
         exit(1);
     }
 
@@ -76,19 +76,19 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-	std::thread *t = new std::thread(receiverThread, server_fd);
-	t->detach();
+    std::thread *t = new std::thread(receiverThread, server_fd);
+    t->detach();
 
     while (true) {
         std::string s;
         std::getline(std::cin, s);
         
         ssize_t res = send(server_fd, s.c_str(), s.size(), 0);
-		if (res == 0 || res == -1) {
-			std::cerr << "send return " << res << std::endl;
-			close(server_fd);
-			exit(1);
-		}
+        if (res == 0 || res == -1) {
+            std::cerr << "send return " << res << std::endl;
+            close(server_fd);
+            exit(1);
+        }
     }
 
     close(server_fd);
